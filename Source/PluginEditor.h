@@ -1,9 +1,8 @@
 #pragma once
 #include "PluginProcessor.h"
 
-// Interface "console portable" : un ecran avec un mini-jeu.
-// La position du petit fantome = le panoramique.
-//   gauche / droite = Pan, haut / bas = Height, taille du fantome = Depth (arriere)
+// Console retro translucide : un ecran LCD avec l'arc de panoramique et un robot,
+// des boutons rotatifs (Input, Rate, Amount, Width, Center), 4 modes et une croix directionnelle.
 class GamePanEditor : public juce::AudioProcessorEditor,
                       private juce::Timer
 {
@@ -19,38 +18,41 @@ public:
     void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
 
 private:
-    enum class Key { none, up, down, left, right, a, b, start, select };
+    enum class Key { none, up, down, left, right, sync, reset };
 
     void timerCallback() override;
 
-    juce::Rectangle<float> screenArea() const;
-    Key hitTest (juce::Point<float> p) const;
+    void rebuildCache (float scale);
+    void drawStatic (juce::Graphics& g);
+    void drawDynamic (juce::Graphics& g);
+    void drawLcd (juce::Graphics& g);
+    void drawKnobAt (juce::Graphics& g, int index);
 
-    void drawScreen (juce::Graphics& g);
-    void drawBody (juce::Graphics& g);
+    float scaleFactor() const;
+    int knobAt (juce::Point<float> p) const;
+    int modeButtonAt (juce::Point<float> p) const;
+    Key keyAt (juce::Point<float> p) const;
 
-    float getParam (const char* id) const;
-    void setParam (const char* id, float plainValue);
-    void nudge (const char* id, float delta);
-    void beginGestures (std::initializer_list<const char*> ids);
-    void endGestures();
-
-    void moveFromMouse (juce::Point<float> p);
-    void spawnStar();
-    juce::Point<float> playerPosition() const;
-    float playerScale() const;
+    float rawParam (const char* id) const;
+    float normParam (const char* id) const;
+    void setNorm (const char* id, float norm);
+    void setPlain (const char* id, float plain);
+    void setChoice (const char* id, int index);
+    void beginGesture (const char* id);
+    void endGesture();
+    void moveFromArc (juce::Point<float> p);
 
     PanPluginProcessor& panProcessor;
 
-    Key held = Key::none;
-    bool draggingScreen = false;
-    juce::StringArray activeGestures;
+    juce::Image cache;
+    float cacheScale = 0.0f;
 
-    juce::Point<float> star { 100.0f, 60.0f };
-    int score = 0;
-    int flash = 0;
-    int frame = 0;
-    juce::Random rng;
+    Key held = Key::none;
+    int activeKnob = -1;
+    bool draggingArc = false;
+    float dragStartY = 0.0f;
+    float dragStartNorm = 0.0f;
+    juce::String activeGesture;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GamePanEditor)
 };
