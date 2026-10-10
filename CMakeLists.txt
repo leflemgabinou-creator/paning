@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(SimplePanner VERSION 1.0.0)
+project(SimplePanner VERSION 2.0.0)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -12,17 +12,19 @@ FetchContent_MakeAvailable(JUCE)
 juce_add_plugin(SimplePanner
     COMPANY_NAME "MyStudio"
     PLUGIN_MANUFACTURER_CODE Mstd
-    PLUGIN_CODE Spn1
+    PLUGIN_CODE Gpn1
     FORMATS VST3 Standalone
-    PRODUCT_NAME "Simple Panner"
+    PRODUCT_NAME "Game Pan"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
-    COPY_PLUGIN_AFTER_BUILD TRUE)
+    COPY_PLUGIN_AFTER_BUILD FALSE)
 
 target_sources(SimplePanner PRIVATE
     Source/PluginProcessor.cpp
-    Source/PluginProcessor.h)
+    Source/PluginProcessor.h
+    Source/PluginEditor.cpp
+    Source/PluginEditor.h)
 
 target_compile_definitions(SimplePanner PUBLIC
     JUCE_WEB_BROWSER=0

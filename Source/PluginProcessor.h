@@ -16,7 +16,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "Simple Panner"; }
+    const juce::String getName() const override { return "Game Pan"; }
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
     double getTailLengthSeconds() const override { return 0.0; }
@@ -35,11 +35,17 @@ public:
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
 
-    std::atomic<float>* panParam   = nullptr;
-    std::atomic<float>* widthParam = nullptr;
-    std::atomic<float>* lawParam   = nullptr;
+    std::atomic<float>* panParam    = nullptr;
+    std::atomic<float>* widthParam  = nullptr;
+    std::atomic<float>* lawParam    = nullptr;
+    std::atomic<float>* heightParam = nullptr;
+    std::atomic<float>* depthParam  = nullptr;
 
-    juce::SmoothedValue<float> panSmooth, widthSmooth;
+    juce::SmoothedValue<float> panSmooth, widthSmooth, depthGainSmooth;
+
+    double currentSampleRate = 44100.0;
+    float lpState[2]    = {};
+    float shelfState[2] = {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanPluginProcessor)
 };
